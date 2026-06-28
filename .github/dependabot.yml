@@ -1,5 +1,3 @@
-# Dependency review
-
 version: 2
 updates:
   - package-ecosystem: npm
@@ -7,6 +5,10 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    versioning-strategy: increase
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
     groups:
       react:
         patterns:
@@ -19,6 +21,7 @@ updates:
           - "vitest"
           - "@vitest/*"
           - "@testing-library/*"
+          - "@playwright/*"
           - "jsdom"
       linting:
         patterns:
@@ -33,8 +36,11 @@ updates:
           - "@vitejs/*"
           - "typescript"
           - "@types/node"
+          - "serve"
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    labels:
+      - ci
