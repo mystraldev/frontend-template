@@ -25,7 +25,7 @@ jobs:
         run: pnpm tsc -b
 
       - name: Unit tests
-        run: pnpm vitest run --coverage
+        run: pnpm vitest run
 
       - name: Build
         run: pnpm run build
