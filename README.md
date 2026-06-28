@@ -11,7 +11,7 @@ React + TypeScript frontend starter template with modern tooling.
 - **Linting:** ESLint (flat config) + Prettier
 - **Testing:** Vitest + Testing Library (unit), Playwright (e2e)
 - **CI:** GitHub Actions (lint, typecheck, test, build, e2e)
-- **Deployment:** Docker (Node.js static server)
+- **Deployment:** Docker (nginx static server)
 
 ## Quick start
 
@@ -23,17 +23,17 @@ pnpm run dev
 
 ## Scripts
 
-| Command             | Description              |
-| ------------------- | ------------------------ |
-| `pnpm run dev`      | Start dev server         |
-| `pnpm run build`    | Type-check + build       |
-| `pnpm run preview`  | Preview production build |
-| `pnpm run lint`     | ESLint check             |
-| `pnpm run format`   | Prettier auto-fix        |
-| `pnpm run format:check` | Prettier check       |
-| `pnpm run typecheck` | TypeScript check        |
-| `pnpm test`         | Run unit tests           |
-| `pnpm run test:e2e` | Run Playwright e2e tests |
+| Command                 | Description              |
+| ----------------------- | ------------------------ |
+| `pnpm run dev`          | Start dev server         |
+| `pnpm run build`        | Type-check and build     |
+| `pnpm run preview`      | Preview production build |
+| `pnpm run lint`         | ESLint check             |
+| `pnpm run format`       | Prettier auto-fix        |
+| `pnpm run format:check` | Prettier check           |
+| `pnpm run typecheck`    | TypeScript check         |
+| `pnpm test`             | Run unit tests           |
+| `pnpm run test:e2e`     | Run Playwright e2e tests |
 
 ## Docker
 

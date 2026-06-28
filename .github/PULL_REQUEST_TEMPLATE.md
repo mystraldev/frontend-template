@@ -19,7 +19,7 @@
 ## Verification
 
 - [ ] `pnpm run build`
-- [ ] `pnpm vitest run --coverage`
+- [ ] `pnpm run test:coverage`
 - [ ] `pnpm lint && pnpm format:check`
 
 Unverifiable: <!-- e.g. UI behaviour, integration, performance — call it out. -->
