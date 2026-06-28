@@ -38,6 +38,8 @@ pnpm run dev
 ## Docker
 
 ```bash
+docker compose up --build
+# or build manually:
 docker build -t frontend-template .
 docker run -p 3000:3000 frontend-template
 ```
