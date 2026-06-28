@@ -7,36 +7,37 @@ React + TypeScript frontend starter template with modern tooling.
 - **Framework:** React 19
 - **Build:** Vite 8
 - **Language:** TypeScript (strict mode)
+- **Package manager:** pnpm
 - **Linting:** ESLint (flat config) + Prettier
 - **Testing:** Vitest + Testing Library (unit), Playwright (e2e)
 - **CI:** GitHub Actions (lint, typecheck, test, build, e2e)
-- **Deployment:** Docker (Nginx multi-stage)
+- **Deployment:** Docker (Node.js static server)
 
 ## Quick start
 
 ```bash
 cp .env.example .env.local
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 ## Scripts
 
-| Command                 | Description                |
-| ----------------------- | -------------------------- |
-| `npm run dev`           | Start dev server           |
-| `npm run build`         | Type-check + build         |
-| `npm run preview`       | Preview production build   |
-| `npm run lint`          | ESLint check               |
-| `npm run format`        | Prettier auto-fix          |
-| `npm run format:check`  | Prettier check             |
-| `npm run typecheck`     | TypeScript check           |
-| `npm test`              | Run unit tests             |
-| `npm run test:e2e`      | Run Playwright e2e tests   |
+| Command             | Description              |
+| ------------------- | ------------------------ |
+| `pnpm run dev`      | Start dev server         |
+| `pnpm run build`    | Type-check + build       |
+| `pnpm run preview`  | Preview production build |
+| `pnpm run lint`     | ESLint check             |
+| `pnpm run format`   | Prettier auto-fix        |
+| `pnpm run format:check` | Prettier check       |
+| `pnpm run typecheck` | TypeScript check        |
+| `pnpm test`         | Run unit tests           |
+| `pnpm run test:e2e` | Run Playwright e2e tests |
 
 ## Docker
 
 ```bash
 docker build -t frontend-template .
-docker run -p 8080:80 frontend-template
+docker run -p 3000:3000 frontend-template
 ```

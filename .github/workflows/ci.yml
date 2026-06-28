@@ -14,21 +14,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
-      - run: npm ci
+      - run: corepack enable && pnpm install --frozen-lockfile
 
       - name: Lint & format check
-        run: npx eslint src/ && npx prettier --check src/
+        run: pnpm eslint src/ test/ && pnpm prettier --check 'src/**/*.{ts,tsx,css}' 'test/**/*.{ts,tsx}'
 
       - name: Type check
-        run: npx tsc -b
+        run: pnpm tsc -b
 
       - name: Unit tests
-        run: npx vitest run --coverage
+        run: pnpm vitest run --coverage
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
   e2e:
     needs: quality
@@ -38,10 +38,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: corepack enable && pnpm install --frozen-lockfile
+      - run: pnpm playwright install --with-deps chromium
 
       - name: E2E tests
-        run: npx playwright test
+        run: pnpm playwright test
