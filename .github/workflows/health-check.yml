@@ -1,0 +1,19 @@
+name: Health check
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # every Monday 06:00 UTC
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
