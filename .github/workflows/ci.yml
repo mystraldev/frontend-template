@@ -6,23 +6,31 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
 
-      - run: corepack enable && pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
 
       - name: Lint & format check
         run: pnpm eslint src/ test/ && pnpm prettier --check 'src/**/*.{ts,tsx,css}' 'test/**/*.{ts,tsx}'
 
       - name: Type check
         run: pnpm tsc -b
+
+      - name: Security audit
+        run: pnpm audit --audit-level=high
 
       - name: Unit tests
         run: pnpm vitest run --coverage
@@ -35,12 +43,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
 
-      - run: corepack enable && pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
       - run: pnpm playwright install --with-deps chromium
 
       - name: E2E tests
