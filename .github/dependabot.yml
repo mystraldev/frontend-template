@@ -1,46 +1,23 @@
 version: 2
+
 updates:
   - package-ecosystem: npm
-    directory: /
     schedule:
       interval: weekly
-      day: monday
-    versioning-strategy: increase
-    open-pull-requests-limit: 10
+    directory: /
     labels:
       - dependencies
-    groups:
-      react:
-        patterns:
-          - "react"
-          - "react-dom"
-          - "@types/react"
-          - "@types/react-dom"
-      testing:
-        patterns:
-          - "vitest"
-          - "@vitest/*"
-          - "@testing-library/*"
-          - "@playwright/*"
-          - "jsdom"
-      linting:
-        patterns:
-          - "eslint"
-          - "@eslint/*"
-          - "eslint-*"
-          - "typescript-eslint"
-          - "prettier"
-      build:
-        patterns:
-          - "vite"
-          - "@vitejs/*"
-          - "typescript"
-          - "@types/node"
-          - "serve"
+
+  - package-ecosystem: docker
+    schedule:
+      interval: weekly
+    directory: /
+    labels:
+      - dependencies
 
   - package-ecosystem: github-actions
-    directory: /
     schedule:
-      interval: monthly
+      interval: weekly
+    directory: /
     labels:
       - ci
