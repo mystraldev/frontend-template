@@ -23,17 +23,14 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Lint & format check
-        run: pnpm eslint src/ test/ && pnpm prettier --check 'src/**/*.{ts,tsx,css}' 'test/**/*.{ts,tsx}'
+      - name: Format check
+        run: pnpm format:check
 
-      - name: Type check
-        run: pnpm tsc -b
+      - name: Check (lint + typecheck + tests)
+        run: pnpm check
 
       - name: Security audit
         run: pnpm audit --audit-level=high
-
-      - name: Unit tests
-        run: pnpm vitest run --coverage
 
       - name: Build
         run: pnpm run build

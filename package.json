@@ -5,19 +5,22 @@
   "type": "module",
   "packageManager": "pnpm@11.9.0",
   "engines": {
-    "node": ">=24.0.0",
+    "node": "^24.0.0",
     "pnpm": "^11.9.0"
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint src/ test/",
-    "format": "prettier --write 'src/**/*.{ts,tsx,css}' 'test/**/*.{ts,tsx}'",
-    "format:check": "prettier --check 'src/**/*.{ts,tsx,css}' 'test/**/*.{ts,tsx}'",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck": "tsc -b",
+    "check": "pnpm lint && pnpm typecheck && pnpm test:coverage",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },
