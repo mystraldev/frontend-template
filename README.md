@@ -11,7 +11,7 @@ React + TypeScript frontend starter template with modern tooling.
 - **Linting:** ESLint (flat config) + Prettier
 - **Testing:** Vitest + Testing Library (unit), Playwright (e2e)
 - **CI:** GitHub Actions (lint, typecheck, test, build, e2e)
-- **Deployment:** Docker (nginx static server)
+- **Deployment:** Docker (Vite preview server)
 
 ## Quick start
 
