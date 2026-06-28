@@ -1,0 +1,15 @@
+# Base
+node_modules
+dist
+coverage
+playwright-report
+test-results
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
