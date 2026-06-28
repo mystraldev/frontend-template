@@ -26,8 +26,14 @@ jobs:
       - name: Format check
         run: pnpm format:check
 
-      - name: Check (lint + typecheck + tests)
-        run: pnpm check
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type check
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test:coverage
 
       - name: Security audit
         run: pnpm audit --audit-level=high
