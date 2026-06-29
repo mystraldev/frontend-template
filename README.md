@@ -52,22 +52,23 @@ reported as errors.
 
 ### Plugins included
 
-| Plugin                                   | Scope                         | What it adds                                                              |
-| ---------------------------------------- | ----------------------------- | ------------------------------------------------------------------------- |
-| `typescript-eslint` (strict + stylistic) | all `.ts`/`.tsx`              | Type-aware correctness and logical-style rules                            |
-| `eslint-plugin-react-hooks`              | `src`, `test`                 | Rules of Hooks + React Compiler rules (`flat/recommended-latest` preset)  |
-| `@eslint-react/eslint-plugin`            | `src`, `test`                 | Core React rules (the ESLint-10-ready successor to `eslint-plugin-react`) |
-| `eslint-plugin-jsx-a11y`                 | `src`, `test`                 | JSX accessibility (alt text, ARIA validity, roles, keyboard handlers)     |
-| `eslint-plugin-react-refresh`            | `src`, `test`                 | Keeps components fast-refresh-safe                                        |
-| `eslint-plugin-import-x`                 | all `.ts`/`.tsx`              | Import ordering, no-duplicates, no-duplicate-exports                      |
-| `eslint-plugin-unicorn`                  | all `.ts`/`.tsx`              | Opinionated modernization / correctness rules                             |
-| `eslint-plugin-sonarjs`                  | all `.ts`/`.tsx`              | Bug-pattern detection and cognitive-complexity checks                     |
-| `eslint-plugin-regexp`                   | all `.ts`/`.tsx`              | Regex correctness/ReDoS safety + autofix                                  |
-| `eslint-plugin-perfectionist`            | all `.ts`/`.tsx`              | Sorts objects, types, interfaces, enums, unions, JSX props (not imports)  |
-| `eslint-plugin-unused-imports`           | all `.ts`/`.tsx`              | Auto-removes unused imports on `--fix`                                    |
-| `@vitest/eslint-plugin`                  | `test`                        | Vitest test correctness (catches `.only`, bad assertions)                 |
-| `eslint-plugin-testing-library`          | `test`                        | React Testing Library best practices                                      |
-| `eslint-plugin-playwright`               | `e2e`, `playwright.config.ts` | Playwright e2e correctness                                                |
+| Plugin                                   | Scope                         | What it adds                                                                  |
+| ---------------------------------------- | ----------------------------- | ----------------------------------------------------------------------------- |
+| `typescript-eslint` (strict + stylistic) | all `.ts`/`.tsx`              | Type-aware correctness and logical-style rules                                |
+| `eslint-plugin-react-hooks`              | `src`, `test`                 | Rules of Hooks + React Compiler rules (`flat/recommended-latest` preset)      |
+| `@eslint-react/eslint-plugin`            | `src`, `test`                 | Core React rules (the ESLint-10-ready successor to `eslint-plugin-react`)     |
+| `eslint-plugin-jsx-a11y`                 | `src`, `test`                 | JSX accessibility (alt text, ARIA validity, roles, keyboard handlers)         |
+| `eslint-plugin-no-unsanitized`           | `src`, `test`                 | XSS sink guard (`innerHTML`, `insertAdjacentHTML`, `dangerouslySetInnerHTML`) |
+| `eslint-plugin-react-refresh`            | `src`, `test`                 | Keeps components fast-refresh-safe                                            |
+| `eslint-plugin-import-x`                 | all `.ts`/`.tsx`              | Import ordering, no-duplicates, no-duplicate-exports                          |
+| `eslint-plugin-unicorn`                  | all `.ts`/`.tsx`              | Opinionated modernization / correctness rules                                 |
+| `eslint-plugin-sonarjs`                  | all `.ts`/`.tsx`              | Bug-pattern detection and cognitive-complexity checks                         |
+| `eslint-plugin-regexp`                   | all `.ts`/`.tsx`              | Regex correctness/ReDoS safety + autofix                                      |
+| `eslint-plugin-perfectionist`            | all `.ts`/`.tsx`              | Sorts objects, types, interfaces, enums, unions, JSX props (not imports)      |
+| `eslint-plugin-unused-imports`           | all `.ts`/`.tsx`              | Auto-removes unused imports on `--fix`                                        |
+| `@vitest/eslint-plugin`                  | `test`                        | Vitest test correctness (catches `.only`, bad assertions)                     |
+| `eslint-plugin-testing-library`          | `test`                        | React Testing Library best practices                                          |
+| `eslint-plugin-playwright`               | `e2e`, `playwright.config.ts` | Playwright e2e correctness                                                    |
 
 A few deliberate wiring choices:
 
@@ -103,6 +104,11 @@ up. The following are **not** installed:
   …); the plugin only adds stylistic rules on top.
 - **`@eslint/compat`** — a flat-config shim for legacy plugins; nothing in this
   stack needs it (every plugin here is flat-config-native).
+- **`eslint-plugin-security`** — Node/server-oriented (child-process, fs, require
+  rules a browser app doesn't hit) and noisy (`detect-object-injection` fires on
+  every `obj[key]`). Its `detect-unsafe-regex` overlaps `eslint-plugin-regexp`.
+  For a frontend, `eslint-plugin-no-unsanitized` (above) is the higher-signal
+  XSS guard; dependency CVEs are covered by `pnpm audit` in the CI gate.
 
 ## Docker
 

@@ -4,6 +4,7 @@ import vitest from '@vitest/eslint-plugin'
 import prettier from 'eslint-config-prettier'
 import importX from 'eslint-plugin-import-x'
 import jsxA11y from 'eslint-plugin-jsx-a11y'
+import noUnsanitized from 'eslint-plugin-no-unsanitized'
 import perfectionist from 'eslint-plugin-perfectionist'
 import playwright from 'eslint-plugin-playwright'
 import reactHooks from 'eslint-plugin-react-hooks'
@@ -110,6 +111,7 @@ export default tseslint.config(
       reactX.configs['recommended-typescript'],
       reactHooks.configs.flat['recommended-latest'],
       jsxA11y.flatConfigs.recommended,
+      noUnsanitized.configs.recommended,
     ],
     languageOptions: { globals: globals.browser },
     plugins: { 'react-refresh': reactRefresh },
