@@ -80,9 +80,11 @@ export default tseslint.config(
   },
 
   // Base — every TS/TSX file in the repo gets type-aware strict + stylistic +
-  // import hygiene + unicorn, then our house rules on top.
+  // import hygiene + unicorn, then our house rules on top. The flat config itself
+  // is excluded: it imports untyped plugins (no type-aware linting / tsconfig).
   {
     files: ['**/*.{ts,tsx}'],
+    ignores: ['eslint.config.ts'],
     extends: [
       js.configs.recommended,
       ...tseslint.configs.strictTypeChecked,
@@ -139,9 +141,10 @@ export default tseslint.config(
     languageOptions: { globals: globals.node },
   },
 
-  // eslint.config.js itself is in no tsconfig — lint it without type-aware rules.
+  // The flat config itself — lint lightly (no type-aware rules, since it's not
+  // in a tsconfig and imports untyped plugins). Node globals for import.meta etc.
   {
-    files: ['eslint.config.js'],
+    files: ['eslint.config.ts'],
     extends: [js.configs.recommended, unicorn.configs['flat/recommended']],
     languageOptions: { globals: globals.node },
     rules: {

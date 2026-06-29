@@ -120,11 +120,13 @@ Everything the template ships with, by category. Versions are pinned exactly
 
 ## Linting
 
-ESLint uses the flat-config format ([eslint.config.js](eslint.config.js)) with
-type-aware rules (`typescript-eslint` `strictTypeChecked` +
-`stylisticTypeChecked`). Prettier owns formatting; `eslint-config-prettier` runs
-last to disable any stylistic overlap. Stale `eslint-disable` directives are
-reported as errors.
+ESLint uses the TypeScript flat config ([eslint.config.ts](eslint.config.ts),
+loaded natively by Node — no `jiti` needed) with type-aware rules
+(`typescript-eslint` `strictTypeChecked` + `stylisticTypeChecked`). Prettier owns
+formatting; `eslint-config-prettier` runs last to disable any stylistic overlap.
+Stale `eslint-disable` directives are reported as errors. The config file itself
+is linted lightly (it imports untyped plugins, so it's kept out of type-aware
+linting and `tsc`).
 
 ### Plugins included
 
