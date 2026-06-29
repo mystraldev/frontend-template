@@ -6,5 +6,5 @@
     "module": "nodenext",
     "types": ["node"]
   },
-  "include": ["vite.config.ts", "playwright.config.ts", "commitlint.config.ts", "e2e"]
+  "include": ["eslint.config.ts", "shims.d.ts", "vite.config.ts", "playwright.config.ts", "commitlint.config.ts", "e2e"]
 }

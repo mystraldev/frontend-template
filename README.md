@@ -21,6 +21,11 @@ pnpm install
 pnpm run dev
 ```
 
+> **Prerequisite for committing:** the `pre-commit` hook runs a
+> [gitleaks](https://github.com/gitleaks/gitleaks) secret scan and **blocks the commit if gitleaks isn't installed**.
+> Install it once (`brew install gitleaks`, or see the [install docs](https://github.com/gitleaks/gitleaks#installing)).
+> Running the app doesn't require it — only committing does.
+
 ## Scripts
 
 | Command                 | Description              |
@@ -41,6 +46,148 @@ pnpm run dev
 | `pnpm run docker:down`  | Stop the Compose stack   |
 | `pnpm run docker:build` | Build the image          |
 | `pnpm run docker:run`   | Run the built image      |
+
+## Tooling
+
+Everything the template ships with, by category. Versions are pinned exactly
+(see [package.json](package.json)); the table lists the headline tools.
+
+### Language & runtime
+
+| Tool       | Version | Role                                                                                      |
+| ---------- | ------- | ----------------------------------------------------------------------------------------- |
+| TypeScript | 6.0.2   | Strict mode + extra safety flags ([tsconfig.base.json](tsconfig.base.json))               |
+| Node.js    | 24.18.0 | Pinned via [.node-version](.node-version), `engines`, and `devEngines` (auto-download)    |
+| pnpm       | 11.9.0  | Package manager, pinned via `packageManager`; workspace policies in `pnpm-workspace.yaml` |
+
+### Framework & build
+
+| Tool                 | Version | Role                              |
+| -------------------- | ------- | --------------------------------- |
+| React + React DOM    | 19.2.7  | UI framework                      |
+| Vite                 | 8.1.0   | Dev server + production bundler   |
+| @vitejs/plugin-react | 6.0.2   | React fast-refresh + JSX for Vite |
+
+### Linting & formatting
+
+| Tool              | Version | Role                                                                   |
+| ----------------- | ------- | ---------------------------------------------------------------------- |
+| ESLint            | 10.6.0  | Flat config + 14 plugins (see [Linting](#linting))                     |
+| typescript-eslint | 8.62.0  | Type-aware `strictTypeChecked` + `stylisticTypeChecked`                |
+| Prettier          | 3.9.1   | Formatting; `eslint-config-prettier` disables ESLint overlap           |
+| EditorConfig      | —       | Editor-level whitespace/charset rules ([.editorconfig](.editorconfig)) |
+
+### Testing
+
+| Tool                            | Version | Role                                                        |
+| ------------------------------- | ------- | ----------------------------------------------------------- |
+| Vitest                          | 4.1.9   | Unit test runner (`@vitest/coverage-v8`)                    |
+| Testing Library                 | 16.3.2  | React component testing (`react`, `jest-dom`, `user-event`) |
+| jsdom                           | 29.1.1  | DOM environment for unit tests                              |
+| Playwright (`@playwright/test`) | 1.61.1  | End-to-end browser tests (Chromium)                         |
+
+### Git hooks & commits
+
+| Tool        | Version | Role                                                                 |
+| ----------- | ------- | -------------------------------------------------------------------- |
+| Husky       | 9.1.7   | Git hooks (`pre-commit`, `commit-msg`)                               |
+| lint-staged | 17.0.8  | Runs ESLint + Prettier on staged files (pre-commit)                  |
+| commitlint  | 21.1.0  | Enforces Conventional Commits (`config-conventional`, on commit-msg) |
+
+### CI/CD & automation (GitHub Actions)
+
+| Workflow                                               | Trigger                     | Role                                                          |
+| ------------------------------------------------------ | --------------------------- | ------------------------------------------------------------- |
+| [ci.yml](.github/workflows/ci.yml)                     | push/PR to `main`           | `ci:quality` gate + gitleaks secret scan, then e2e (Chromium) |
+| [release.yml](.github/workflows/release.yml)           | manual dispatch             | Tags the next SemVer `vX.Y.Z` release                         |
+| [health-check.yml](.github/workflows/health-check.yml) | weekly cron (Mon 06:00 UTC) | Re-runs `ci:quality` to catch drift/rot                       |
+| [dependabot.yml](.github/dependabot.yml)               | weekly                      | Dependency updates for npm, Docker, and GitHub Actions        |
+
+### Containerization & deployment
+
+| Tool           | Role                                                                |
+| -------------- | ------------------------------------------------------------------- |
+| Docker         | Multi-stage build ([Dockerfile](Dockerfile)); non-root static serve |
+| Docker Compose | Local stack ([docker-compose.yml](docker-compose.yml))              |
+| serve (14.2.6) | Serves the static `dist/` in the production image                   |
+
+### Repo hygiene & supply-chain
+
+- **[CODEOWNERS](.github/CODEOWNERS)** + **[PR template](.github/PULL_REQUEST_TEMPLATE.md)** — review ownership and PR structure.
+- **`pnpm-workspace.yaml` policies** — `engineStrict` (hard Node/pnpm gate), `minimumReleaseAge: 1440` (refuse packages published <1 day ago, to dodge fresh supply-chain compromises), and explicit `allowBuilds`/`peerDependencyRules`.
+- **Secret scanning** with [gitleaks](https://github.com/gitleaks/gitleaks) (pinned to v8.30.1) on two layers: the `pre-commit` hook scans staged changes locally, and the `secret-scan` CI job scans the whole tree on every push/PR. The CI job downloads the pinned binary directly (no marketplace action, no `GITLEAKS_LICENSE` needed for org repos).
+- **`pnpm audit`** (high severity) in the quality gate; **[.gitattributes](.gitattributes)**, **[.editorconfig](.editorconfig)**, and **[.dockerignore](.dockerignore)** for consistency.
+
+## Linting
+
+ESLint uses the TypeScript flat config ([eslint.config.ts](eslint.config.ts),
+loaded natively by Node — no `jiti` needed) with type-aware rules
+(`typescript-eslint` `strictTypeChecked` + `stylisticTypeChecked`). Prettier owns
+formatting; `eslint-config-prettier` runs last to disable any stylistic overlap.
+Stale `eslint-disable` directives are reported as errors. The config file is
+type-checked by `tsc` (via tiny ambient shims in [shims.d.ts](shims.d.ts) for the
+two plugins that ship no types), but kept out of the type-aware ESLint rules to
+avoid imposing the app's opinionated sorting on the config objects.
+
+### Plugins included
+
+| Plugin                                   | Scope                         | What it adds                                                                  |
+| ---------------------------------------- | ----------------------------- | ----------------------------------------------------------------------------- |
+| `typescript-eslint` (strict + stylistic) | all `.ts`/`.tsx`              | Type-aware correctness and logical-style rules                                |
+| `eslint-plugin-react-hooks`              | `src`, `test`                 | Rules of Hooks + React Compiler rules (`flat/recommended-latest` preset)      |
+| `@eslint-react/eslint-plugin`            | `src`, `test`                 | Core React rules (the ESLint-10-ready successor to `eslint-plugin-react`)     |
+| `eslint-plugin-jsx-a11y`                 | `src`, `test`                 | JSX accessibility (alt text, ARIA validity, roles, keyboard handlers)         |
+| `eslint-plugin-no-unsanitized`           | `src`, `test`                 | XSS sink guard (`innerHTML`, `insertAdjacentHTML`, `dangerouslySetInnerHTML`) |
+| `eslint-plugin-react-refresh`            | `src`, `test`                 | Keeps components fast-refresh-safe                                            |
+| `eslint-plugin-import-x`                 | all `.ts`/`.tsx`              | Import ordering, no-duplicates, no-duplicate-exports                          |
+| `eslint-plugin-unicorn`                  | all `.ts`/`.tsx`              | Opinionated modernization / correctness rules                                 |
+| `eslint-plugin-sonarjs`                  | all `.ts`/`.tsx`              | Bug-pattern detection and cognitive-complexity checks                         |
+| `eslint-plugin-regexp`                   | all `.ts`/`.tsx`              | Regex correctness/ReDoS safety + autofix                                      |
+| `eslint-plugin-perfectionist`            | all `.ts`/`.tsx`              | Sorts objects, types, interfaces, enums, unions, JSX props (not imports)      |
+| `eslint-plugin-unused-imports`           | all `.ts`/`.tsx`              | Auto-removes unused imports on `--fix`                                        |
+| `@vitest/eslint-plugin`                  | `test`                        | Vitest test correctness (catches `.only`, bad assertions)                     |
+| `eslint-plugin-testing-library`          | `test`                        | React Testing Library best practices                                          |
+| `eslint-plugin-playwright`               | `e2e`, `playwright.config.ts` | Playwright e2e correctness                                                    |
+
+A few deliberate wiring choices:
+
+- **`import-x` resolution rules** (`no-unresolved`, `named`, `default`,
+  `namespace`) are **off** — TypeScript's own checker covers module resolution
+  better, which avoids a separate resolver dependency. The bundled node resolver
+  is wired only so `import-x/order` can classify import groups.
+- **`import-x/order` owns import ordering**, so `perfectionist`'s import-sorting
+  rules are left off (running both fix-fights). Perfectionist handles all other
+  sorting (objects, types, enums, JSX props).
+- **`unused-imports` owns unused detection** (`@typescript-eslint/no-unused-vars`
+  is disabled) because it can auto-_remove_ dead imports on `--fix`, which the
+  ts-eslint rule deliberately won't.
+- **`jsx-a11y`** runs fine on ESLint 10 even though its published peer-dep range
+  still caps at `^9` (the code uses no APIs removed in v10). The stale-cap
+  install warning is silenced via a `peerDependencyRules` entry in
+  [pnpm-workspace.yaml](pnpm-workspace.yaml); revisit when a release lists
+  ESLint 10 ([jsx-eslint #1075](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/issues/1075)).
+
+### Plugins deliberately omitted (ESLint 10 compatibility)
+
+This template runs ESLint 10, and parts of the plugin ecosystem have not caught
+up. The following are **not** installed:
+
+- **`eslint-plugin-react`** — caps at ESLint `^9` and throws at runtime on 10.
+  Replaced by `@eslint-react/eslint-plugin` above.
+- **`eslint-plugin-import`** — caps at ESLint `^9` and breaks at runtime on 10.
+  Replaced by `eslint-plugin-import-x` above.
+- **`eslint-plugin-jest-dom`** — peer dep caps at ESLint `^9`; low marginal
+  value over `testing-library`, so skipped rather than force-installed.
+- **`eslint-plugin-promise`** — redundant: `strictTypeChecked` already enforces
+  the type-aware promise suite (`no-floating-promises`, `no-misused-promises`,
+  …); the plugin only adds stylistic rules on top.
+- **`@eslint/compat`** — a flat-config shim for legacy plugins; nothing in this
+  stack needs it (every plugin here is flat-config-native).
+- **`eslint-plugin-security`** — Node/server-oriented (child-process, fs, require
+  rules a browser app doesn't hit) and noisy (`detect-object-injection` fires on
+  every `obj[key]`). Its `detect-unsafe-regex` overlaps `eslint-plugin-regexp`.
+  For a frontend, `eslint-plugin-no-unsanitized` (above) is the higher-signal
+  XSS guard; dependency CVEs are covered by `pnpm audit` in the CI gate.
 
 ## Docker
 

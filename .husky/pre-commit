@@ -1,1 +1,12 @@
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "✖ gitleaks is required for the secret-scan pre-commit hook but was not found."
+  echo "  Install it: brew install gitleaks  (or see https://github.com/gitleaks/gitleaks#installing)"
+  exit 1
+fi
+
+if ! gitleaks git --pre-commit --staged --redact --no-banner; then
+  echo "✖ gitleaks detected a potential secret in your staged changes (see above). Commit blocked."
+  exit 1
+fi
+
 pnpm lint-staged

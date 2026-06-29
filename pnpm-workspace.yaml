@@ -1,3 +1,12 @@
+allowBuilds:
+  unrs-resolver: true
+
+# eslint-plugin-jsx-a11y@6.10.2 caps its eslint peer dep at ^9, but the code
+# uses no APIs removed in ESLint 10 and runs correctly. Silence the stale-cap
+# warning until a release that lists ESLint 10 ships (jsx-eslint #1075).
+peerDependencyRules:
+  allowedVersions:
+    'eslint-plugin-jsx-a11y>eslint': '10'
 # Block install on a Node/pnpm version outside package.json's engines range,
 # instead of only warning — makes the pinned engines a hard gate.
 engineStrict: true
