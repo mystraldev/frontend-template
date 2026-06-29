@@ -11,7 +11,7 @@ React + TypeScript frontend starter template with modern tooling.
 - **Linting:** ESLint (flat config) + Prettier
 - **Testing:** Vitest + Testing Library (unit), Playwright (e2e)
 - **CI:** GitHub Actions (lint, typecheck, test, build, e2e)
-- **Deployment:** Docker (nginx static server)
+- **Deployment:** Docker (Vite preview server)
 
 ## Quick start
 
@@ -34,6 +34,9 @@ pnpm run dev
 | `pnpm run typecheck`    | TypeScript check         |
 | `pnpm test`             | Run unit tests           |
 | `pnpm run test:e2e`     | Run Playwright e2e tests |
+| `pnpm run audit`        | Audit dependencies       |
+| `pnpm run ci:quality`   | Run PR quality gate      |
+| `pnpm run ci`           | Run full local CI gate   |
 
 ## Docker
 
@@ -43,3 +46,7 @@ docker compose up --build
 docker build -t frontend-template .
 docker run -p 3000:3000 frontend-template
 ```
+
+## Release
+
+Releases are tagged manually from the GitHub Actions `Release` workflow. Choose the SemVer bump (`patch`, `minor`, or `major`) when dispatching the workflow; it creates and pushes the next `vX.Y.Z` tag from the latest existing release tag.
