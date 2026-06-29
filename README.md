@@ -11,7 +11,7 @@ React + TypeScript frontend starter template with modern tooling.
 - **Linting:** ESLint (flat config) + Prettier
 - **Testing:** Vitest + Testing Library (unit), Playwright (e2e)
 - **CI:** GitHub Actions (lint, typecheck, test, build, e2e)
-- **Deployment:** Docker (Vite preview server)
+- **Deployment:** Docker (multi-stage build, static `serve`)
 
 ## Quick start
 
@@ -46,6 +46,15 @@ docker compose up --build
 docker build -t frontend-template .
 docker run -p 3000:3000 frontend-template
 ```
+
+The image is a two-stage build: the first stage compiles the app, the second
+serves the static `dist/` with `serve` as the non-root `node` user (no dev
+toolchain in the final image).
+
+> **Build-time env vars:** Vite inlines `VITE_`-prefixed variables into the
+> bundle at **build** time, not at container run time. To configure the app per
+> environment, pass them during the build (e.g. a `docker build` `--build-arg`
+> wired to a Vite env), not via the runtime `environment:` block.
 
 ## Release
 
