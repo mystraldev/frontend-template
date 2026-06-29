@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
 
 # --- Build stage: full toolchain, produces the static dist/ ---
+# Scanners flag this base tag for a CVE in npm's bundled undici; npm is unused
+# here and stripped from the runtime stage below, so the shipped image is clean.
 FROM node:24.18.0-alpine AS builder
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
