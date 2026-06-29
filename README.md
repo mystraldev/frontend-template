@@ -124,9 +124,10 @@ ESLint uses the TypeScript flat config ([eslint.config.ts](eslint.config.ts),
 loaded natively by Node — no `jiti` needed) with type-aware rules
 (`typescript-eslint` `strictTypeChecked` + `stylisticTypeChecked`). Prettier owns
 formatting; `eslint-config-prettier` runs last to disable any stylistic overlap.
-Stale `eslint-disable` directives are reported as errors. The config file itself
-is linted lightly (it imports untyped plugins, so it's kept out of type-aware
-linting and `tsc`).
+Stale `eslint-disable` directives are reported as errors. The config file is
+type-checked by `tsc` (via tiny ambient shims in [shims.d.ts](shims.d.ts) for the
+two plugins that ship no types), but kept out of the type-aware ESLint rules to
+avoid imposing the app's opinionated sorting on the config objects.
 
 ### Plugins included
 

@@ -17,6 +17,8 @@ import unusedImports from 'eslint-plugin-unused-imports'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
+import type { Linter } from 'eslint'
+
 // Type-aware parsing shared by every block that runs the type-checked rule sets.
 const typeAwareLanguageOptions = {
   ecmaVersion: 2023,
@@ -24,7 +26,7 @@ const typeAwareLanguageOptions = {
     projectService: true,
     tsconfigRootDir: import.meta.dirname,
   },
-}
+} satisfies Linter.LanguageOptions
 
 // House rules layered on top of the recommended presets, applied to all our TS.
 const houseRules = {
@@ -67,7 +69,7 @@ const houseRules = {
   'perfectionist/sort-union-types': ['error', { type: 'natural' }],
   'perfectionist/sort-enums': ['error', { type: 'natural' }],
   'perfectionist/sort-jsx-props': ['error', { type: 'natural' }],
-}
+} satisfies Linter.RulesRecord
 
 export default tseslint.config(
   {
@@ -141,12 +143,13 @@ export default tseslint.config(
     languageOptions: { globals: globals.node },
   },
 
-  // The flat config itself — lint lightly (no type-aware rules, since it's not
-  // in a tsconfig and imports untyped plugins). Node globals for import.meta etc.
+  // The flat config itself — lint lightly (no type-aware rules to avoid the
+  // opinionated churn the app rules would impose on config objects). Uses the TS
+  // parser for syntax only; Node globals for import.meta etc.
   {
     files: ['eslint.config.ts'],
     extends: [js.configs.recommended, unicorn.configs['flat/recommended']],
-    languageOptions: { globals: globals.node },
+    languageOptions: { globals: globals.node, parser: tseslint.parser },
     rules: {
       'unicorn/prevent-abbreviations': 'off',
     },
