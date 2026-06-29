@@ -16,6 +16,7 @@ import unicorn from 'eslint-plugin-unicorn'
 import unusedImports from 'eslint-plugin-unused-imports'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
+import { defineConfig, globalIgnores } from 'eslint/config'
 
 import type { Linter } from 'eslint'
 
@@ -71,10 +72,8 @@ const houseRules = {
   'perfectionist/sort-jsx-props': ['error', { type: 'natural' }],
 } satisfies Linter.RulesRecord
 
-export default tseslint.config(
-  {
-    ignores: ['dist', 'node_modules', 'coverage', 'playwright-report', 'test-results'],
-  },
+export default defineConfig(
+  globalIgnores(['dist', 'node_modules', 'coverage', 'playwright-report', 'test-results']),
   {
     linterOptions: {
       reportUnusedDisableDirectives: 'error',
