@@ -42,6 +42,76 @@ pnpm run dev
 | `pnpm run docker:build` | Build the image          |
 | `pnpm run docker:run`   | Run the built image      |
 
+## Tooling
+
+Everything the template ships with, by category. Versions are pinned exactly
+(see [package.json](package.json)); the table lists the headline tools.
+
+### Language & runtime
+
+| Tool       | Version | Role                                                                                      |
+| ---------- | ------- | ----------------------------------------------------------------------------------------- |
+| TypeScript | 6.0.2   | Strict mode + extra safety flags ([tsconfig.base.json](tsconfig.base.json))               |
+| Node.js    | 24.18.0 | Pinned via [.node-version](.node-version), `engines`, and `devEngines` (auto-download)    |
+| pnpm       | 11.9.0  | Package manager, pinned via `packageManager`; workspace policies in `pnpm-workspace.yaml` |
+
+### Framework & build
+
+| Tool                 | Version | Role                              |
+| -------------------- | ------- | --------------------------------- |
+| React + React DOM    | 19.2.7  | UI framework                      |
+| Vite                 | 8.1.0   | Dev server + production bundler   |
+| @vitejs/plugin-react | 6.0.2   | React fast-refresh + JSX for Vite |
+
+### Linting & formatting
+
+| Tool              | Version | Role                                                                   |
+| ----------------- | ------- | ---------------------------------------------------------------------- |
+| ESLint            | 10.6.0  | Flat config + 14 plugins (see [Linting](#linting))                     |
+| typescript-eslint | 8.62.0  | Type-aware `strictTypeChecked` + `stylisticTypeChecked`                |
+| Prettier          | 3.9.1   | Formatting; `eslint-config-prettier` disables ESLint overlap           |
+| EditorConfig      | —       | Editor-level whitespace/charset rules ([.editorconfig](.editorconfig)) |
+
+### Testing
+
+| Tool                            | Version | Role                                                        |
+| ------------------------------- | ------- | ----------------------------------------------------------- |
+| Vitest                          | 4.1.9   | Unit test runner (`@vitest/coverage-v8`)                    |
+| Testing Library                 | 16.3.2  | React component testing (`react`, `jest-dom`, `user-event`) |
+| jsdom                           | 29.1.1  | DOM environment for unit tests                              |
+| Playwright (`@playwright/test`) | 1.61.1  | End-to-end browser tests (Chromium)                         |
+
+### Git hooks & commits
+
+| Tool        | Version | Role                                                                 |
+| ----------- | ------- | -------------------------------------------------------------------- |
+| Husky       | 9.1.7   | Git hooks (`pre-commit`, `commit-msg`)                               |
+| lint-staged | 17.0.8  | Runs ESLint + Prettier on staged files (pre-commit)                  |
+| commitlint  | 21.1.0  | Enforces Conventional Commits (`config-conventional`, on commit-msg) |
+
+### CI/CD & automation (GitHub Actions)
+
+| Workflow                                               | Trigger                     | Role                                                   |
+| ------------------------------------------------------ | --------------------------- | ------------------------------------------------------ |
+| [ci.yml](.github/workflows/ci.yml)                     | push/PR to `main`           | `ci:quality` gate, then e2e (Chromium)                 |
+| [release.yml](.github/workflows/release.yml)           | manual dispatch             | Tags the next SemVer `vX.Y.Z` release                  |
+| [health-check.yml](.github/workflows/health-check.yml) | weekly cron (Mon 06:00 UTC) | Re-runs `ci:quality` to catch drift/rot                |
+| [dependabot.yml](.github/dependabot.yml)               | weekly                      | Dependency updates for npm, Docker, and GitHub Actions |
+
+### Containerization & deployment
+
+| Tool           | Role                                                                |
+| -------------- | ------------------------------------------------------------------- |
+| Docker         | Multi-stage build ([Dockerfile](Dockerfile)); non-root static serve |
+| Docker Compose | Local stack ([docker-compose.yml](docker-compose.yml))              |
+| serve (14.2.6) | Serves the static `dist/` in the production image                   |
+
+### Repo hygiene & supply-chain
+
+- **[CODEOWNERS](.github/CODEOWNERS)** + **[PR template](.github/PULL_REQUEST_TEMPLATE.md)** — review ownership and PR structure.
+- **`pnpm-workspace.yaml` policies** — `engineStrict` (hard Node/pnpm gate), `minimumReleaseAge: 1440` (refuse packages published <1 day ago, to dodge fresh supply-chain compromises), and explicit `allowBuilds`/`peerDependencyRules`.
+- **`pnpm audit`** (high severity) in the quality gate; **[.gitattributes](.gitattributes)**, **[.editorconfig](.editorconfig)**, and **[.dockerignore](.dockerignore)** for consistency.
+
 ## Linting
 
 ESLint uses the flat-config format ([eslint.config.js](eslint.config.js)) with
