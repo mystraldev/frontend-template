@@ -3,11 +3,16 @@ import reactX from '@eslint-react/eslint-plugin'
 import vitest from '@vitest/eslint-plugin'
 import prettier from 'eslint-config-prettier'
 import importX from 'eslint-plugin-import-x'
+import jsxA11y from 'eslint-plugin-jsx-a11y'
+import perfectionist from 'eslint-plugin-perfectionist'
 import playwright from 'eslint-plugin-playwright'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import regexp from 'eslint-plugin-regexp'
+import sonarjs from 'eslint-plugin-sonarjs'
 import testingLibrary from 'eslint-plugin-testing-library'
 import unicorn from 'eslint-plugin-unicorn'
+import unusedImports from 'eslint-plugin-unused-imports'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
@@ -22,7 +27,12 @@ const typeAwareLanguageOptions = {
 
 // House rules layered on top of the recommended presets, applied to all our TS.
 const houseRules = {
-  '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+  // unused-imports owns unused detection so it can auto-remove dead imports on
+  // --fix (ts-eslint's rule only reports). Disable the ts-eslint rule to avoid
+  // double-reporting.
+  '@typescript-eslint/no-unused-vars': 'off',
+  'unused-imports/no-unused-imports': 'error',
+  'unused-imports/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
   '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
   '@typescript-eslint/no-import-type-side-effects': 'error',
   'no-console': ['error', { allow: ['warn', 'error'] }],
@@ -48,6 +58,14 @@ const houseRules = {
   'unicorn/prevent-abbreviations': 'off', // props, params, env, ref… are idiomatic here
   'unicorn/filename-case': ['error', { cases: { camelCase: true, pascalCase: true } }], // App.tsx, main.tsx
   'unicorn/no-null': 'off', // React APIs use null pervasively
+  // Perfectionist for non-import sorting only — import-x/order stays the import
+  // authority, so perfectionist's import rules are left off.
+  'perfectionist/sort-objects': ['error', { type: 'natural' }],
+  'perfectionist/sort-object-types': ['error', { type: 'natural' }],
+  'perfectionist/sort-interfaces': ['error', { type: 'natural' }],
+  'perfectionist/sort-union-types': ['error', { type: 'natural' }],
+  'perfectionist/sort-enums': ['error', { type: 'natural' }],
+  'perfectionist/sort-jsx-props': ['error', { type: 'natural' }],
 }
 
 export default tseslint.config(
@@ -70,8 +88,14 @@ export default tseslint.config(
       ...tseslint.configs.stylisticTypeChecked,
       importX.configs['flat/recommended'],
       unicorn.configs['flat/recommended'],
+      regexp.configs['flat/recommended'],
+      sonarjs.configs.recommended,
     ],
     languageOptions: typeAwareLanguageOptions,
+    plugins: {
+      'unused-imports': unusedImports,
+      perfectionist,
+    },
     // Bundled node resolver (handles TS extensions) — no extra resolver dep.
     settings: {
       'import-x/resolver-next': [importX.createNodeResolver({ extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'] })],
@@ -79,10 +103,14 @@ export default tseslint.config(
     rules: houseRules,
   },
 
-  // Browser app + unit tests — React component rules, hooks, and fast-refresh.
+  // Browser app + unit tests — React component rules, hooks, a11y, fast-refresh.
   {
     files: ['src/**/*.{ts,tsx}', 'test/**/*.{ts,tsx}'],
-    extends: [reactX.configs['recommended-typescript'], reactHooks.configs.flat['recommended-latest']],
+    extends: [
+      reactX.configs['recommended-typescript'],
+      reactHooks.configs.flat['recommended-latest'],
+      jsxA11y.flatConfigs.recommended,
+    ],
     languageOptions: { globals: globals.browser },
     plugins: { 'react-refresh': reactRefresh },
     rules: {

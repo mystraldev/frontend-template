@@ -57,32 +57,52 @@ reported as errors.
 | `typescript-eslint` (strict + stylistic) | all `.ts`/`.tsx`              | Type-aware correctness and logical-style rules                            |
 | `eslint-plugin-react-hooks`              | `src`, `test`                 | Rules of Hooks + React Compiler rules (`flat/recommended-latest` preset)  |
 | `@eslint-react/eslint-plugin`            | `src`, `test`                 | Core React rules (the ESLint-10-ready successor to `eslint-plugin-react`) |
+| `eslint-plugin-jsx-a11y`                 | `src`, `test`                 | JSX accessibility (alt text, ARIA validity, roles, keyboard handlers)     |
 | `eslint-plugin-react-refresh`            | `src`, `test`                 | Keeps components fast-refresh-safe                                        |
 | `eslint-plugin-import-x`                 | all `.ts`/`.tsx`              | Import ordering, no-duplicates, no-duplicate-exports                      |
 | `eslint-plugin-unicorn`                  | all `.ts`/`.tsx`              | Opinionated modernization / correctness rules                             |
+| `eslint-plugin-sonarjs`                  | all `.ts`/`.tsx`              | Bug-pattern detection and cognitive-complexity checks                     |
+| `eslint-plugin-regexp`                   | all `.ts`/`.tsx`              | Regex correctness/ReDoS safety + autofix                                  |
+| `eslint-plugin-perfectionist`            | all `.ts`/`.tsx`              | Sorts objects, types, interfaces, enums, unions, JSX props (not imports)  |
+| `eslint-plugin-unused-imports`           | all `.ts`/`.tsx`              | Auto-removes unused imports on `--fix`                                    |
 | `@vitest/eslint-plugin`                  | `test`                        | Vitest test correctness (catches `.only`, bad assertions)                 |
 | `eslint-plugin-testing-library`          | `test`                        | React Testing Library best practices                                      |
 | `eslint-plugin-playwright`               | `e2e`, `playwright.config.ts` | Playwright e2e correctness                                                |
 
-`import-x`'s resolution rules (`no-unresolved`, `named`, `default`, `namespace`)
-are intentionally **off** — TypeScript's own checker covers module resolution
-better, and disabling them avoids needing a separate resolver dependency. The
-bundled node resolver is wired only so `import-x/order` can classify groups.
+A few deliberate wiring choices:
+
+- **`import-x` resolution rules** (`no-unresolved`, `named`, `default`,
+  `namespace`) are **off** — TypeScript's own checker covers module resolution
+  better, which avoids a separate resolver dependency. The bundled node resolver
+  is wired only so `import-x/order` can classify import groups.
+- **`import-x/order` owns import ordering**, so `perfectionist`'s import-sorting
+  rules are left off (running both fix-fights). Perfectionist handles all other
+  sorting (objects, types, enums, JSX props).
+- **`unused-imports` owns unused detection** (`@typescript-eslint/no-unused-vars`
+  is disabled) because it can auto-_remove_ dead imports on `--fix`, which the
+  ts-eslint rule deliberately won't.
+- **`jsx-a11y`** runs fine on ESLint 10 even though its published peer-dep range
+  still caps at `^9` (the code uses no APIs removed in v10). The stale-cap
+  install warning is silenced via a `peerDependencyRules` entry in
+  [pnpm-workspace.yaml](pnpm-workspace.yaml); revisit when a release lists
+  ESLint 10 ([jsx-eslint #1075](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/issues/1075)).
 
 ### Plugins deliberately omitted (ESLint 10 compatibility)
 
 This template runs ESLint 10, and parts of the plugin ecosystem have not caught
-up. The following are **not** installed until ESLint-10-compatible releases ship:
+up. The following are **not** installed:
 
-- **`eslint-plugin-jsx-a11y`** — the notable gap. Peer dep caps at ESLint `^9`
-  with no release in ~20 months; the in-flight fix (6.11) is unreleased. No
-  drop-in accessibility replacement exists yet — revisit when it lands.
 - **`eslint-plugin-react`** — caps at ESLint `^9` and throws at runtime on 10.
   Replaced by `@eslint-react/eslint-plugin` above.
 - **`eslint-plugin-import`** — caps at ESLint `^9` and breaks at runtime on 10.
   Replaced by `eslint-plugin-import-x` above.
 - **`eslint-plugin-jest-dom`** — peer dep caps at ESLint `^9`; low marginal
   value over `testing-library`, so skipped rather than force-installed.
+- **`eslint-plugin-promise`** — redundant: `strictTypeChecked` already enforces
+  the type-aware promise suite (`no-floating-promises`, `no-misused-promises`,
+  …); the plugin only adds stylistic rules on top.
+- **`@eslint/compat`** — a flat-config shim for legacy plugins; nothing in this
+  stack needs it (every plugin here is flat-config-native).
 
 ## Docker
 
