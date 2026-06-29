@@ -13,7 +13,11 @@ FROM node:24.18.0-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN corepack enable && pnpm install --prod --frozen-lockfile --ignore-scripts
+# Install with pnpm (via corepack), then strip the bundled npm — it's unused at
+# runtime (we run serve directly) and drags in CVEs of its own dependency tree.
+RUN corepack enable \
+  && pnpm install --prod --frozen-lockfile --ignore-scripts \
+  && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 COPY --from=builder /app/dist ./dist
 USER node
 EXPOSE 3000
