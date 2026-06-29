@@ -1,2 +1,9 @@
+# Block install on a Node/pnpm version outside package.json's engines range,
+# instead of only warning — makes the pinned engines a hard gate.
+engineStrict: true
+
+# Refuse to install package versions published less than 1 day ago, to avoid
+# pulling in a freshly-compromised release before it's caught and yanked.
+minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - prettier@3.9.1
