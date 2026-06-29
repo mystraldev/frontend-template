@@ -37,14 +37,18 @@ pnpm run dev
 | `pnpm run audit`        | Audit dependencies       |
 | `pnpm run ci:quality`   | Run PR quality gate      |
 | `pnpm run ci`           | Run full local CI gate   |
+| `pnpm run docker:up`    | Build + run via Compose  |
+| `pnpm run docker:down`  | Stop the Compose stack   |
+| `pnpm run docker:build` | Build the image          |
+| `pnpm run docker:run`   | Run the built image      |
 
 ## Docker
 
 ```bash
-docker compose up --build
-# or build manually:
-docker build -t frontend-template .
-docker run -p 3000:3000 frontend-template
+pnpm run docker:up
+# or build and run the image manually:
+pnpm run docker:build
+pnpm run docker:run
 ```
 
 The image is a two-stage build: the first stage compiles the app, the second

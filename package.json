@@ -24,6 +24,10 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "audit": "pnpm audit --audit-level=high",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:build": "docker build -t frontend-template .",
+    "docker:run": "docker run --rm -p 3000:3000 frontend-template",
     "ci:quality": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test:coverage && pnpm run audit && pnpm run build",
     "ci": "pnpm run ci:quality && pnpm run test:e2e",
     "prepare": "husky"
