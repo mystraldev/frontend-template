@@ -11,10 +11,9 @@ test-results
 .vscode
 .idea
 
-# Env
-.env
-.env.local
-.env.*.local
+# Env (never copy real env files into the image; keep the template)
+.env*
+!.env.example
 
 # Logs
 logs
