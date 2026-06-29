@@ -21,6 +21,11 @@ pnpm install
 pnpm run dev
 ```
 
+> **Prerequisite for committing:** the `pre-commit` hook runs a
+> [gitleaks](https://github.com/gitleaks/gitleaks) secret scan and **blocks the commit if gitleaks isn't installed**.
+> Install it once (`brew install gitleaks`, or see the [install docs](https://github.com/gitleaks/gitleaks#installing)).
+> Running the app doesn't require it — only committing does.
+
 ## Scripts
 
 | Command                 | Description              |
@@ -91,12 +96,12 @@ Everything the template ships with, by category. Versions are pinned exactly
 
 ### CI/CD & automation (GitHub Actions)
 
-| Workflow                                               | Trigger                     | Role                                                   |
-| ------------------------------------------------------ | --------------------------- | ------------------------------------------------------ |
-| [ci.yml](.github/workflows/ci.yml)                     | push/PR to `main`           | `ci:quality` gate, then e2e (Chromium)                 |
-| [release.yml](.github/workflows/release.yml)           | manual dispatch             | Tags the next SemVer `vX.Y.Z` release                  |
-| [health-check.yml](.github/workflows/health-check.yml) | weekly cron (Mon 06:00 UTC) | Re-runs `ci:quality` to catch drift/rot                |
-| [dependabot.yml](.github/dependabot.yml)               | weekly                      | Dependency updates for npm, Docker, and GitHub Actions |
+| Workflow                                               | Trigger                     | Role                                                          |
+| ------------------------------------------------------ | --------------------------- | ------------------------------------------------------------- |
+| [ci.yml](.github/workflows/ci.yml)                     | push/PR to `main`           | `ci:quality` gate + gitleaks secret scan, then e2e (Chromium) |
+| [release.yml](.github/workflows/release.yml)           | manual dispatch             | Tags the next SemVer `vX.Y.Z` release                         |
+| [health-check.yml](.github/workflows/health-check.yml) | weekly cron (Mon 06:00 UTC) | Re-runs `ci:quality` to catch drift/rot                       |
+| [dependabot.yml](.github/dependabot.yml)               | weekly                      | Dependency updates for npm, Docker, and GitHub Actions        |
 
 ### Containerization & deployment
 
@@ -110,6 +115,7 @@ Everything the template ships with, by category. Versions are pinned exactly
 
 - **[CODEOWNERS](.github/CODEOWNERS)** + **[PR template](.github/PULL_REQUEST_TEMPLATE.md)** — review ownership and PR structure.
 - **`pnpm-workspace.yaml` policies** — `engineStrict` (hard Node/pnpm gate), `minimumReleaseAge: 1440` (refuse packages published <1 day ago, to dodge fresh supply-chain compromises), and explicit `allowBuilds`/`peerDependencyRules`.
+- **Secret scanning** with [gitleaks](https://github.com/gitleaks/gitleaks) (pinned to v8.30.1) on two layers: the `pre-commit` hook scans staged changes locally, and the `secret-scan` CI job scans the whole tree on every push/PR. The CI job downloads the pinned binary directly (no marketplace action, no `GITLEAKS_LICENSE` needed for org repos).
 - **`pnpm audit`** (high severity) in the quality gate; **[.gitattributes](.gitattributes)**, **[.editorconfig](.editorconfig)**, and **[.dockerignore](.dockerignore)** for consistency.
 
 ## Linting

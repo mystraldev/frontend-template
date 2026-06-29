@@ -30,6 +30,21 @@ jobs:
       - name: Quality gate
         run: pnpm run ci:quality
 
+  secret-scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GITLEAKS_VERSION: 8.30.1
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Scan for secrets (gitleaks)
+        run: |
+          set -euo pipefail
+          curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" -o gitleaks.tar.gz
+          tar xzf gitleaks.tar.gz gitleaks
+          ./gitleaks dir . --redact --no-banner --exit-code 1
+
   e2e:
     needs: quality
     runs-on: ubuntu-24.04
