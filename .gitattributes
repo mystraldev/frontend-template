@@ -1,0 +1,14 @@
+# Normalize line endings to LF on checkout/commit across platforms.
+* text=eol=lf
+
+# Treat binary assets as binary (no EOL normalization, no text diff).
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+
+# Lockfile: generated, large, not useful to diff.
+pnpm-lock.yaml -diff
