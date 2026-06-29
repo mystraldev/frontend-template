@@ -6,7 +6,7 @@ export default defineConfig({
   forbidOnly: !!process.env['CI'],
   // No retries by design: a test that only passes on retry is masking a real bug.
   retries: 0,
-  ...(process.env['CI'] ? { workers: 1 } : {}),
+  ...(process.env['CI'] && { workers: 1 }),
   reporter: 'html',
   use: {
     baseURL: 'http://localhost:4173',

@@ -42,6 +42,48 @@ pnpm run dev
 | `pnpm run docker:build` | Build the image          |
 | `pnpm run docker:run`   | Run the built image      |
 
+## Linting
+
+ESLint uses the flat-config format ([eslint.config.js](eslint.config.js)) with
+type-aware rules (`typescript-eslint` `strictTypeChecked` +
+`stylisticTypeChecked`). Prettier owns formatting; `eslint-config-prettier` runs
+last to disable any stylistic overlap. Stale `eslint-disable` directives are
+reported as errors.
+
+### Plugins included
+
+| Plugin                                   | Scope                         | What it adds                                                              |
+| ---------------------------------------- | ----------------------------- | ------------------------------------------------------------------------- |
+| `typescript-eslint` (strict + stylistic) | all `.ts`/`.tsx`              | Type-aware correctness and logical-style rules                            |
+| `eslint-plugin-react-hooks`              | `src`, `test`                 | Rules of Hooks + React Compiler rules (`flat/recommended-latest` preset)  |
+| `@eslint-react/eslint-plugin`            | `src`, `test`                 | Core React rules (the ESLint-10-ready successor to `eslint-plugin-react`) |
+| `eslint-plugin-react-refresh`            | `src`, `test`                 | Keeps components fast-refresh-safe                                        |
+| `eslint-plugin-import-x`                 | all `.ts`/`.tsx`              | Import ordering, no-duplicates, no-duplicate-exports                      |
+| `eslint-plugin-unicorn`                  | all `.ts`/`.tsx`              | Opinionated modernization / correctness rules                             |
+| `@vitest/eslint-plugin`                  | `test`                        | Vitest test correctness (catches `.only`, bad assertions)                 |
+| `eslint-plugin-testing-library`          | `test`                        | React Testing Library best practices                                      |
+| `eslint-plugin-playwright`               | `e2e`, `playwright.config.ts` | Playwright e2e correctness                                                |
+
+`import-x`'s resolution rules (`no-unresolved`, `named`, `default`, `namespace`)
+are intentionally **off** — TypeScript's own checker covers module resolution
+better, and disabling them avoids needing a separate resolver dependency. The
+bundled node resolver is wired only so `import-x/order` can classify groups.
+
+### Plugins deliberately omitted (ESLint 10 compatibility)
+
+This template runs ESLint 10, and parts of the plugin ecosystem have not caught
+up. The following are **not** installed until ESLint-10-compatible releases ship:
+
+- **`eslint-plugin-jsx-a11y`** — the notable gap. Peer dep caps at ESLint `^9`
+  with no release in ~20 months; the in-flight fix (6.11) is unreleased. No
+  drop-in accessibility replacement exists yet — revisit when it lands.
+- **`eslint-plugin-react`** — caps at ESLint `^9` and throws at runtime on 10.
+  Replaced by `@eslint-react/eslint-plugin` above.
+- **`eslint-plugin-import`** — caps at ESLint `^9` and breaks at runtime on 10.
+  Replaced by `eslint-plugin-import-x` above.
+- **`eslint-plugin-jest-dom`** — peer dep caps at ESLint `^9`; low marginal
+  value over `testing-library`, so skipped rather than force-installed.
+
 ## Docker
 
 ```bash

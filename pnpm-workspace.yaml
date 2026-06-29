@@ -1,3 +1,5 @@
+allowBuilds:
+  unrs-resolver: true
 # Block install on a Node/pnpm version outside package.json's engines range,
 # instead of only warning — makes the pinned engines a hard gate.
 engineStrict: true
