@@ -3,7 +3,7 @@
 # --- Build stage: full toolchain, produces the static dist/ ---
 # Scanners flag this base tag for a CVE in npm's bundled undici; npm is unused
 # here and stripped from the runtime stage below, so the shipped image is clean.
-FROM node:24.18.0-alpine AS builder
+FROM node:25.9.0-alpine AS builder
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN corepack enable && pnpm install --frozen-lockfile
@@ -11,7 +11,7 @@ COPY . .
 RUN pnpm run build
 
 # --- Runtime stage: production deps only, serves dist/ as non-root ---
-FROM node:24.18.0-alpine AS runner
+FROM node:25.9.0-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
